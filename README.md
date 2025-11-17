@@ -191,6 +191,10 @@ for i in {1..101}; do curl http://localhost:8000/weather/London; done
 - **Predis**: PHP Redis client for caching and rate limiting
 - **PSR HTTP Message**: HTTP message interfaces (dependency of Predis)
 
+## Resources
+
+- [Weather API Wrapper Service Roadmap](https://roadmap.sh/projects/weather-api-wrapper-service)
+
 ## License
 
 This project is licensed under the MIT License.
