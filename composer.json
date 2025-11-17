@@ -1,0 +1,17 @@
+{
+    "name": "omer/weather-app",
+    "autoload": {
+        "psr-4": {
+            "Omer\\WeatherApp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "OmerAbdel-aziz",
+            "email": "omercode3@gmail.com"
+        }
+    ],
+    "require": {
+        "predis/predis": "^3.2"
+    }
+}
