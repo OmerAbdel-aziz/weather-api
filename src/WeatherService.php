@@ -10,15 +10,33 @@ EnvLoader::load();
 class WeatherService {
     private $apiKey;
     private $cacheExpiration;
+    private $redis;
     
 
 
     public function __construct(){
         $this->apiKey = $_ENV['VISUAL_CROSSING_API_KEY'] ?? '';
         $this->cacheExpiration = intval($_ENV['CACHE_EXPIRATION'] ?? 43200);
+        $this->redis = new Predis\Client(
+            [
+                'scheme' => 'tcp',
+                'port' => $_ENV['REDIS_PORT'] ?? 6379,
+                'database' => $_ENV['REDIS_DB'] ?? 0,
+                'host' => $_ENV['REDIS_HOST'] ?? '',
+            ]
+        );
     }
 
     public function getWeather($city) {
+        $cacheKey = "weather:{$city}";
+        //check cache first
+        $cachedData = $this->redis->get($cacheKey);
+        if ($cachedData) {
+            return json_decode($cachedData, true);
+        }
+
+
+
         $url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{$city}"
          . "?unitGroup=metric&key={$this->apiKey}&contentType=json";
 
@@ -67,13 +85,16 @@ class WeatherService {
             throw new Exception('No current weather data available');
         }
 
-        return [
+        $result = [
             'location' => $city,
             'temperature' => $current['temp'],
             'condition' => $current['conditions'],
             'humidity' => $current['humidity'],
             'wind_speed' => $current['windspeed']
         ];
+
+        $this->redis->setex($cacheKey, $this->cacheExpiration, json_encode($result));
+        return $result;
 
     }
 }
